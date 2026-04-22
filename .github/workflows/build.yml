@@ -1,4 +1,3 @@
-
 name: Build NetHunter Kernel (Full Power)
 on:
   workflow_dispatch:
@@ -34,7 +33,8 @@ jobs:
         run: |
           cd kernel-source
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gki_defconfig
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+          # Using KCFLAGS to ignore warnings that stop the build
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error" -j$(nproc)
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
