@@ -1,4 +1,4 @@
-name: Build GKI Kernel
+name: Build NetHunter Kernel (Full Power)
 on:
   workflow_dispatch:
 
@@ -12,14 +12,31 @@ jobs:
       - name: Set up Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential flex bison libssl-dev libelf-dev gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu git
+          sudo apt-get install -y bc build-essential flex bison libssl-dev libelf-dev libncurses-dev
 
-      - name: Download Kernel Source
+      - name: Download and Setup
         run: |
           git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10 kernel-source
+          cd kernel-source
+          
+          # Adding WiFi Drivers & Monitor Mode Support
+          echo "CONFIG_WLAN=y" >> arch/arm64/configs/gki_defconfig
+          echo "CONFIG_ATH9K_HTC=y" >> arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CFG80211=y" >> arch/arm64/configs/gki_defconfig
+          echo "CONFIG_MAC80211=y" >> arch/arm64/configs/gki_defconfig
+          echo "CONFIG_CFG80211_WEXT=y" >> arch/arm64/configs/gki_defconfig
+          
+          # Add KernelSU (The New Super Power)
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
       - name: Build Kernel
         run: |
           cd kernel-source
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- gki_defconfig
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: NetHunter-Kernel-Final
+          path: kernel-source/arch/arm64/boot/Image
