@@ -1,3 +1,4 @@
+
 name: Build NetHunter Kernel (Full Power)
 on:
   workflow_dispatch:
@@ -12,7 +13,7 @@ jobs:
       - name: Set up Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc build-essential flex bison libssl-dev libelf-dev libncurses-dev
+          sudo apt-get install -y bc build-essential flex bison libssl-dev libelf-dev libncurses-dev gcc-aarch64-linux-gnu
 
       - name: Download and Setup
         run: |
@@ -26,7 +27,7 @@ jobs:
           echo "CONFIG_MAC80211=y" >> arch/arm64/configs/gki_defconfig
           echo "CONFIG_CFG80211_WEXT=y" >> arch/arm64/configs/gki_defconfig
           
-          # Add KernelSU (The New Super Power)
+          # Add KernelSU
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
 
       - name: Build Kernel
